@@ -1,3 +1,9 @@
+'''
+Learning webscrapping
+This file basically scrapes data from yahoo finance and uses pandas to make the data look better when outputed
+learning selenium and phantomJS right now to improve my webscrapping skills (if theres any better libraries please recommend haha
+Disclaimer: i didn't use beautifulsoup because i am abit slow in understanding it so i used split function to really see how my data are being divided
+'''
 import requests
 import pandas as pd
 wikiurl = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
