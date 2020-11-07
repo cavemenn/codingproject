@@ -1,0 +1,43 @@
+from selenium import webdriver
+import json
+import pandas as pd
+
+url = 'https://finance.yahoo.com/quote/AAPL/key-statistics?p=AAPL'
+
+def findXpath(element,target,path):
+    if target in element.get_attribute("textContent") and element.tag_name == "script":
+        return path
+    newElements = element.find_elements_by_xpath('./*')
+    for newElement in newElements:
+        print(path + "/" + newElement.tag_name)
+        final = findXpath(newElement,target,path + "/" + newElement.tag_name)
+        if final != "":
+            return final
+    return ""
+
+def findJsonPath(jsonObject,target,path,matchType):
+    if type(jsonObject) == matchType:
+        if target in jsonObject:
+            return path
+        for newKey in jsonObject:
+            final = findJsonPath(jsonObject[newKey],target,path+","+newKey,matchType)
+            if final != "":
+                return final
+    return ""
+
+browser = webdriver.Chrome(executable_path= r"C:\Users\User\PycharmProjects\webscraping\Drivers\chromedriver.exe")
+browser.get(url)
+element = browser.find_element_by_xpath("html/body/script[1]")
+tempData = element.get_attribute("textContent").strip("(this));\n")
+tempData = tempData.split("root.App.main = ")[1][:-3]
+jsonData = json.loads(tempData)
+matchType = type(jsonData)
+print('Final path is: ',findJsonPath(jsonData,"trailingPE","",matchType))
+#print(jsonData.keys())
+#print(jsonData["context"]["dispatcher"]["stores"]["QuoteSummaryStore"]["summaryDetail"])
+
+finalData = jsonData["context"]["dispatcher"]["stores"]["QuoteSummaryStore"]["summaryDetail"]
+df = pd.DataFrame(finalData)
+print(df)
+
+browser.quit()
